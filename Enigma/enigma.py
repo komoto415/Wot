@@ -1,155 +1,221 @@
-import re;
+import re
 
 class Rotor:
-    def __init__(self, position):
-        self.position = position
+    def __init__(self, wiring):
+        self.wiring = wiring
+        self.position = 0
 
-    def __rotate__(self)
+    def rotate(self):
+        self.position+=1
+        if(self.position == 26):
+            self.position = 0
 
-class Mappings:
-    def __init__(self):
-        self.mapping = dict{}
+    def encipher(self, send, direction):
+        if direction:
+            send = (send+self.position) % 26
+            output = self.wiring[send][1]
+            return output
+        if not direction:
+            for i in range(26):
+                if send == self.wiring[i][1]:
+                    output = (self.wiring[i][0] - self.position)
+                    while (output < 0):
+                        output = output + 26
+                    output = output % 26
+                    return output
 
-    def __setitem__(self, key, value):
-        if value in self.mapping:
-            del self.mapping[self.mapping[value]]
-        self.mapping[key] = value
 
-    def __getitem__(self, item):
-        return self.mapping[item]
+    def __str__(self):
+        return str(self.wiring)
 
+class PlugBoard:
+    def __init__(self, wiring):
+        self.wiring = wiring
+    
+    def encipher(self, send, direction):
+        if direction:
+            send = send % 26
+            return self.wiring[send][1]
+        if not direction:
+            send = self.wiring[send][1]
+            return self.wiring[send][0] % 26
+        
 def main():
-    print('Rotor Placements')
+    global alphabet, encipher
+    alphabet = getSubstitutions('alphabet')
+
     print(' _____________________________ ')
     print('|   __     __     __     __   |')
     print('|  |  | < |  | < |  | < |  |  |')
     print('|  |rf|   |r1|   |r2|   |r3|  |')
     print('|  |__| > |__| > |__| > |__|  |')
-    print('|  q w e r t y u i o p    bck |')
-    print('|   a s d f g h j k l    entr |')
-    print('|    z x c v b n m        suh |')
+    print('|  Q W E R T Y U I O P    bck |')
+    print('|   A S D F G H J K L    entr |')
+    print('|    Z X C V B N M       nope |')
     print('|_____________________________|')
 
-    #               Rotor Wiring Table
-    #                           A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    applyInputs()
+    retString = ""
 
-    # Rotor Alpha wiring:       J G D Q O X U S C A M I F R V T P N E W K B L Z Y H
-    # Rotor Beta wiring:        N T Z P S F B O K M W R C J D I V L A E Y U X H G Q
-    # Rotor Charlie wiring:     J V I U B H T C D Y A K E Q Z P O S G X N R M W F L
-    # Reflector Alpha:          E J M Z A L Y X V B W F C R Q U O N T S P I K H G D
-    # Reflector Beta:           F V P J I A O Y E D R Z X W G C T K U Q S B N M H L
-
-    # Turnover notches
-    #   I             Q	      If rotor steps from Q to R, the next rotor is advanced
-    #   II	          E    	  If rotor steps from E to F, the next rotor is advanced
-    #   III	          V	      If rotor steps from V to W, the next rotor is advanced
-    #   IV	          J	      If rotor steps from J to K, the next rotor is advanced
-    #   V	          Z       If rotor steps from Z to A, the next rotor is advanced
-    #   VI,VII,VIII	  Z+M	  If rotor steps from Z to A, or from M to N the next rotor is advanced
-
-    # Rotor 1, 2 , 3 left to right, reflector 1 starting AAA, assume no increments
-    # Input                 P
-    # Step 1 (R3):          P -> P
-    # Step 2 (R2):          P -> I
-    # Step 3 (R1):          I -> C
-    # Step 4 (Reflector):   C -> M
-    # Step 5 (IvR1):        M -> F
-    # Step 6 (IvR2):        F -> F
-    # Step 7 (IvR3):        F -> H
-    # Outcome               H
-
-    global alphabet, rotorAlphaList, rotorBetaList, rotorCharlieList, reflectorAlphaList, reflectorBetaList, rotorOrder;
-
-    alphabet = getSubstitutions('alphabet')
-
-    rotorAlphaList = rotor(makeList([], getSubstitutions('rotorAlpha')))
-
-    rotorBetaList = rotor(makeList([], getSubstitutions('rotorBeta')))
-
-    rotorCharlieList = rotor(makeList([], getSubstitutions('rotorCharlie')))
-
-    reflectorAlphaList = rotor(makeList([], getSubstitutions('reflector1')))
-
-    reflectorBetaList = rotor(makeList([], getSubstitutions('reflector2')))
-
-    rotorAlphaMapping = Mappings()
-    rotorAlphaMapping["A"] = "L"
-    rotorAlphaMapping["B"] = "Q"
-    rotorAlphaMapping["C"] = "J"
-
-#     All Dicts
-#     global rotorAlphaDict;
-#     rotorAlphaDict = {}
-#     reflectorBetaDict = makeDict({},getSubstitutions('rotor1'))
-#
-#     global rotorBetaDict;
-#     rotorBetaDict = {}
-#     reflectorBetaDict = makeDict({},getSubstitutions('rotor2'))
-#
-#     global rotorCharlieDict;
-#     rotorCharlieDict = {}
-#     reflectorBetaDict = makeDict({},getSubstitutions('rotor3'))
-#
-#     global reflectorAlphaDict;
-#     reflectorBetaDict = makeDict({},getSubstitutions('reflector1'))
-#
-#     global reflectorBetaDict;
-#     reflectorBetaDict = makeDict({},getSubstitutions('reflector2'))
-
-    # Send order is as seen in my pretty picture
-    rotorOrder = selectRotorOrder(reflectorAlphaList,rotorAlphaList,rotorBetaList,rotorCharlieList)
-    while True:
-#         char = input("Give me a letter to encipher: ")
-        char = 'A'
-        if re.match("^[A-Z]$", char):
-            print('Input -->', char)
-            # output = 'A'
-            output = nonIncrementListRec(char,0)
-#             output = nonIncrementListItr(char)
-            print('\nOutput -->', output)
-            print(char + ' --> ' + output)
-            return False
+    # print(len(encipher))
+    for i in range(len(encipher)):
+        if encipher[i] == ' ':
+            retString+= ''
         else:
-            print("Try again")
+            retString += numIndexToChar(execute(i))
+    print(retString)
 
-def makeList(liste, subs):
-    for i in range(26):
-        liste.append([alphabet[i],subs[i]])
-    return liste
+def applyInputs():
+    global encipher, rotorThr, rotorTwo, rotorOne, reflc, plugBrd
+    inputs = getInputs()
 
-def makeDict(dicte, subs):
+    encipher = inputs[0]
+    rotors = inputs[1]
+    positions = inputs[2]
+    reflc = inputs[3]
+    plugBrd = inputs[4]
+
+#     print()
+#     print(encipher)
+#     print(rotors)
+#     print(positions)
+#     print(reflc)
+#     print()
+
+    for i in range(len(encipher)):
+        encipher[i] = charToNumIndex(encipher[i])
+
+    rotorThr = numberToRotor(int(rotors[2]))
+    rotorTwo = numberToRotor(int(rotors[1]))
+    rotorOne = numberToRotor(int(rotors[0]))
+
+    rotorThr.position = int(positions[2])
+    rotorTwo.position = int(positions[1])
+    rotorOne.position = int(positions[0])
+
+    reflc = numberToReflc(reflc)
+    
+#     plugBrd = PlugBoard(plugBrd)
+
+def getInputs():
+    validInput = False
+    while not validInput:
+        encipher = input("\nWhat do you want to encrypt? ")
+        validInput = (re.match("[A-Z]", encipher.strip()))
+        if not validInput:
+            print('no goo')
+    encipher = list(encipher.replace(" ", "").upper())
+
+    validInput = False
+    while not validInput:
+        print("\nThe order you type them will be represented as in the image above")
+        print("Example: 2 3 1 --> r1 r2 r3")
+        print("Available rotors: 1, 2, 3, 4, 5")
+        rotors = input("What rotors do you want to use? ")
+        validInput = re.match("^[1-3] [1-3] [1-3]$", rotors.strip())
+        if not validInput:
+            print('no goo')
+        else:
+            rotors = rotors.strip().split(" ")
+            validInput = not (rotors[0] == rotors[1] or rotors[1] == rotors[2] or rotors[0] == rotors[2])
+            if not validInput:
+                print('no goo')
+
+    validInput = False
+    while not validInput:
+        print("\nValid positions are between 0 and 26 inclusive")
+        positions = input("What position do you want to start at? ")
+        validInput = re.match("^[0-26] [0-26] [0-26]$", positions.strip())
+        if not validInput:
+            print('no goo')
+    positions = positions.strip().split(" ")
+
+    validInput = False
+    while not validInput:
+        print("\nAvailable reflectors: 1, 2")
+        reflc = int(input("What reflector would you like to use? "))
+        validInput = reflc == 1 or reflc == 2
+        if not validInput:
+            print('no goo')
+    
+    validInput = False
+    while not validInput:
+        plugBrd = input("\nWhat plug board connections do you wants? ")
+        validInput = re.match("^([A-Z]{2})( [A-Z]{2})*", plugBrd.strip())
+        if not validInput:
+            print('no goo')
+    plugBrd = list(plugBrd.split(" "))
+    for i in range(len(plugBrd)):
+        plugBrd[i] = list(plugBrd[i])
+        plugBrd[i] = [charToNumIndex(plugBrd[i][0]),charToNumIndex(plugBrd[i][1])]
+#     print(plugBrd)
+    
+    return [encipher, rotors, positions, reflc, plugBrd]
+
+def execute(index):
+    global encipher, rotorThr, rotorTwo, rotorOne, reflc, plugBrd
+    encipherLetter = encipher[index]
+    
+#     encipherLetter = plugBrd.encipher(encipherLetter, True)
+    encipherLetter = rotorThr.encipher(encipherLetter, True)
+    encipherLetter = rotorTwo.encipher(encipherLetter, True)
+    encipherLetter = rotorOne.encipher(encipherLetter, True)
+    encipherLetter = reflc.encipher(encipherLetter, True)
+    encipherLetter = rotorOne.encipher(encipherLetter, False)
+    encipherLetter = rotorTwo.encipher(encipherLetter, False)
+    encipherLetter = rotorThr.encipher(encipherLetter, False)
+#     encipherLetter = plugBrd.encipher(encipherLetter, False)
+    
+    moveRotors()
+    return encipherLetter
+
+def moveRotors():
+    global rotorThr, rotorTwo, rotorOne
+    rotorThr.rotate()
+    if rotorThr.position == 26:
+        rotorThr.position = 0
+        rotorTwo.rotate()
+    if (rotorTwo.position == 26):
+        rotorTwo.setPosition = 0
+        rotorOne.rotate()
+    if rotorOne.position == 26:
+        rotorOne.position = 0
+
+def charToNumIndex(char):
+    return ord(char.upper()) - 65
+
+def numIndexToChar(num):
+    return chr(num + 65)
+
+def numberToRotor(rotorNum):
+    switch = {
+        1: Rotor(makeList([], getSubstitutions('rotorAlpha'))),
+        2: Rotor(makeList([], getSubstitutions('rotorBeta'))),
+        3: Rotor(makeList([], getSubstitutions('rotorCharlie'))),
+        4: Rotor(makeList([], getSubstitutions('rotorDelta'))),
+        5: Rotor(makeList([], getSubstitutions('rotorEpsilon'))),
+        }
+    return switch.get(rotorNum, "nothing")
+
+def numberToReflc(reflcNum):
+    switch = {
+        1: Rotor(makeList([], getSubstitutions('reflectorAlpha'))),
+        2: Rotor(makeList([], getSubstitutions('reflectorBeta'))),
+        }
+    return switch.get(reflcNum, "nothing")
+
+def makeList(myList, subs):
+    global alphabet
     for i in range(26):
-        dicte[alphabet[i]] = subs[i]
-    return dicte
+        myList.append([alphabet[i],subs[i]])
+    return myList
 
 def getSubstitutions(sub):
     textFile = sub + '.txt'
     with open(textFile, 'r') as subFile:
-        return (subFile.readline().split(" "))
-
-def selectRotorOrder(r1, r2, r3, rf):
-    return [r3,r2,r1,rf,r1,r2,r3]
-
-def nonIncrementListItr(char):
-    for i in range(len(rotorOrder)):
-        print(char)
-        j = ord(char) - 65
-        char = rotorOrder[i][j][1]
-        print(char)
-    return char
-
-def nonIncrementListRec(char, step):
-    index = ord(char) - 65
-    print(char)
-    if (step == len(rotorOrder)):
-        return char
-    char = rotorOrder[step][index][1]
-    print(char)
-    return nonIncrementListRec(char, step+1)
-
-# def nonIncrementDict(char):
-#     print(rotorAlphaDict)
-#     print(rotorAlphaDict[char])
-#     return True
+        subFile = list(subFile.readline().rstrip('\n'))
+        for i in range(len(subFile)):
+            subFile[i] = charToNumIndex(subFile[i])
+        return (subFile)
 
 main()
