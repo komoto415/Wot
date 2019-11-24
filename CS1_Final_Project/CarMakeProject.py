@@ -17,7 +17,7 @@ def mainMenu():
     # While will force the user to stay in the main menu until they input a valid entry
     while (userResponse != 4):
         # Checks if the user has run the application before
-        # State simply makes it so that the previous selections don't appear everytime if the case the user 
+        # State simply makes it so that the previous selections don't appear everytime if the case the user
         # puts invalid inputs and just presents on launch
         if path.exists('showroomInfo.txt') and beenHereBefore() and state == 0:
                 state = 1
@@ -97,8 +97,8 @@ def addToFile(allInOne):
         showroomInfo.write(userName + ' ')
         for i in range(len(allInOne)):
             showroomInfo.write(str(allInOne[i]) + ' ')
-        showroomInfo.write('\n')    
-         
+        showroomInfo.write('\n')
+
 def printAll(infoList):
     #Print the list of all the selections
     print('Car Make: ' + infoList[0] +
@@ -119,9 +119,9 @@ def selectAccessories():
         addOnSelected = input("Please put in desired add-ons: ")
         # As this is more complicated than length 1 strings, RegEx string validation allows us enforce matching components of
         # a string rather than making disgustingly big if else chains.
-        # In addition, this allows the user to select multiple options and be prompted a single time rather than only 
+        # In addition, this allows the user to select multiple options and be prompted a single time rather than only
         # being allowed to pick on option at a time and be asked if they'd like to continue choosing
-        validFormat = re.match("^[1-3]$|^[1-3],[1-3]$|^[1-3],[1-3],[1-3]$", addOnSelected)
+        validFormat = re.match("^0$|^[1-3]$|^[1-3],[1-3]$|^[1-3],[1-3],[1-3]$", addOnSelected)
         if not validFormat:
             print('Incorrect formating. Please try again!')
     addOnList = addOnSelected.split(',')
@@ -130,7 +130,7 @@ def selectAccessories():
     addOn2 = 'null'
     addOn3 = 'null'
 
-    # Since we don't want users to buy multiple of the same option, we are just looking for if our array contains the desired 
+    # Since we don't want users to buy multiple of the same option, we are just looking for if our array contains the desired
     # add on. Key word 'in' only cares about the value existing in the container, not how many times it occurs in the container
     # Note, it can be easily modified to if we wanted the user to select multiples of the same option
     # Count occurence of choice in container and append the occurence to the string
@@ -185,7 +185,7 @@ def selectModelOf(make):
     model = False;
     if (selected > 3 or selected < 1):
         print('\nThat is not a valid option. Select between 1-3 only.')
-    
+
     else:
         model = ''
         if (make == 'BMW'):
