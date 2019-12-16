@@ -3,7 +3,7 @@ class Scrabble:
         noLetterYet = ' '
         self.boardSize = 10
         self.board = [[noLetterYet for i in range(self.boardSize)] for j in range(self.boardSize)]
-        # Where (0,0) starts at the top left and and (4,4) is the bottom right
+        # Where (0,0) is the top left and (self.boardSize-1, self.boardSize-1) is the bottom right
         # Indexed by zero
         self.tileSet = {
                 'O' : 0,
@@ -31,6 +31,8 @@ class Scrabble:
     def hasWordBeenMade(self):
         wordListR = []
         wordListC = []
+        # Doesn't actually check if a word has been made yet, just joins the rows and coloumns to see what
+        # strings are built from current state of the board
         for i in range(self.boardSize):
             wordListR.append(''.join(self.board[i]))
             wordListC.append(''.join(row[i] for row in self.board))
@@ -39,9 +41,9 @@ class Scrabble:
         wordList = wordListR + wordListC
         print('Combined words found: ')
         for word in range(len(wordList)):
-            print('[' + wordList[word] + ']')
-            if (word == len(wordList)/2-1):
+            if (word == len(wordList)/2):
                 print()
+            print('[' + wordList[word] + ']')
 
 def main():
     board = Scrabble()
@@ -54,6 +56,7 @@ def main():
     print()
     for rows in b:
         print(rows)
+
     print()
     print(board.hasWordBeenMade())
 main()
