@@ -1,6 +1,8 @@
 class Scrabble:
     def __init__(self):
         noLetterYet = ' '
+        self.points = 0
+        self.direction = ['x+', 'x-', 'y+', 'y-']
         self.boardSize = 10
         self.board = [[noLetterYet for i in range(self.boardSize)] for j in range(self.boardSize)]
         # Where (0,0) is the top left and (self.boardSize-1, self.boardSize-1) is the bottom right
@@ -18,15 +20,36 @@ class Scrabble:
                 'P' : 9
             }
 
-    def placeTile(self, x, y, tile):
-        assert tile in self.tileSet.keys()
+    def placeTile(self, x, y, direction, tiles):
+        assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of proper tiles"
+        assert direction in self.direction, "Not a valid direction"
+        assert x - len(tiles) >= 0 or len(tiles) + x < self.boardSize, "Cannot place off the board in the x direction"
+        assert y - len(tiles) >= 0 or len(tiles) + y < self.boardSize, "Cannot place off the board in the y direction"
         assert 0 <= x < self.boardSize, "Not a valid x position on the board"
         assert 0 <= y < self.boardSize, "Not a valid y position on the board"
         assert self.board[y][x] == ' ', "Can't place a tile here!"
 
-        self.board[y][x] = tile
-        print('Tile ' + tile + ' has been added to the board!')
-        # self.hasWordBeenMade()
+        if 'x' in list(direction):
+            if '+' in list(direction):
+                for letter in range(len(tiles)):
+                    self.board[y][x+letter] = tiles[letter]
+            else:
+                for letter in range(len(tiles)):
+                    self.board[y][x-letter] = tiles[-1-letter]
+        else:
+            if '+' in list(direction):
+                for letter in range(len(tiles)):
+                    self.board[y+letter][x] = tiles[letter]
+                    self.points += self.tileSet[tiles[letter]]
+            else:
+                for letter in range(len(tiles)):
+                    self.board[y-letter][x] = tiles[-1-letter]
+
+        self.tallyPoints(tiles)
+
+    def tallyPoints(self, tiles):
+        for i in range(len(tiles)):
+            self.points += self.tileSet[tiles[i]]
 
     def hasWordBeenMade(self):
         wordListR = []
@@ -50,13 +73,15 @@ def main():
     b = board.board
 
     print()
-    board.placeTile(1,0,'B')
-    board.placeTile(1,2,'L')
+
+    word1 = ['L','E','E','T']
+    board.placeTile(9,3,'x-',word1)
+    # board.placeTile(1,2,'L')
 
     print()
     for rows in b:
         print(rows)
 
     print()
-    print(board.hasWordBeenMade())
+    print(board.points)
 main()
