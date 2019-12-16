@@ -6,6 +6,7 @@ class Scrabble:
         self.boardSize = 10
         self.board = [[noLetterYet for i in range(self.boardSize)] for j in range(self.boardSize)]
         # Where (0,0) is the top left and (self.boardSize-1, self.boardSize-1) is the bottom right
+        # board[COLOUMNS][ROWS]
         # Indexed by zero
         self.tileSet = {
                 'O' : 0,
@@ -27,7 +28,24 @@ class Scrabble:
         assert y - len(tiles) >= 0 or len(tiles) + y < self.boardSize, "Cannot place off the board in the y direction"
         assert 0 <= x < self.boardSize, "Not a valid x position on the board"
         assert 0 <= y < self.boardSize, "Not a valid y position on the board"
-        assert self.board[y][x] == ' ', "Can't place a tile here!"
+        # Need to account for placing tiles over existing tiles.
+        # ex:
+        #    State 1:
+        #    ' ',' ',' ',' '
+        #    ' ',' ',' ',' '
+        #    'L','E','E','T'
+        #    ' '.' ',' ',' '
+
+        #    State 2: placeTile(1,0,'y+',['L','E','E','T'])
+        #    ' ','L',' ',' '
+        #    ' ','E',' ',' '
+        #    'L','E','E','T'
+        #    ' '.'T',' ',' '
+        # Check that the would be intersected coordinate char is equal to the corresponding iterated incomingArr char
+        # Using above example because explaining is hard: (Not proper code)
+        # assert ['L','E','E','T'][2] == board[2][1]
+
+        # assert self.board[y][x] == ' ', "Can't place a tile here!"
 
         if 'x' in list(direction):
             if '+' in list(direction):
@@ -73,7 +91,6 @@ def main():
     b = board.board
 
     print()
-
     word1 = ['L','E','E','T']
     board.placeTile(9,3,'x-',word1)
     # board.placeTile(1,2,'L')
