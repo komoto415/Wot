@@ -1,3 +1,5 @@
+from functools import reduce
+
 class Scrabble:
     def __init__(self):
         noLetterYet = ' '
@@ -56,7 +58,6 @@ class Scrabble:
 
 
         # Is there a way to insert directly with a range
-
         if 'x' in list(direction):
             # Can these be made functional;
             if '-' in list(direction):
@@ -69,15 +70,12 @@ class Scrabble:
             for letter in range(len(tiles)):
                 self.board[y+letter][x] = tiles[letter]
 
-        self.tallyPoints(tiles)
+        self.points += reduce((lambda x,y: x+y), list(map(lambda x: self.tileSet[x], tiles)))
 
     def checkIntersection(self, x, y, direction, tiles):
         print()
 
-    def tallyPoints(self, tiles):
-        for i in range(len(tiles)):
-            self.points += self.tileSet[tiles[i]]
-
+    # Don't need this
     def hasWordBeenMade(self):
         wordListR = []
         wordListC = []
@@ -99,7 +97,6 @@ def main():
     board = Scrabble()
     b = board.board
 
-    print()
     word1 = ['L','E','T']
     board.placeTile(9,3,'x-',word1)
     # board.placeTile(1,2,'L')
