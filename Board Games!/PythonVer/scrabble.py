@@ -2,15 +2,15 @@ from functools import reduce
 
 class Scrabble:
     def __init__(self):
-        noLetterYet = ' '
+        self.noLetterYet = '-'
         self.points = 0
         self.direction = ['x+', 'x-', 'y+', 'y-']
         self.boardSize = 15
-        self.board = [[noLetterYet for i in range(self.boardSize)] for j in range(self.boardSize)]
+        self.board = [[self.noLetterYet for i in range(self.boardSize)] for j in range(self.boardSize)]
         # Where (0,0) is the top left and (self.boardSize-1, self.boardSize-1) is the bottom right
         # board[COLOUMNS][ROWS]
         # Positive x and y are right and down
-        # Indexed by zero
+        # Indexed by one
         self.tileSet = {
                 'O' : 0,
                 'L' : 1,
@@ -27,39 +27,15 @@ class Scrabble:
     def placeTile(self, x, y, direction, tiles):
         assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of valid tiles"
         assert direction in self.direction, "Not a valid direction"
-        assert 0 <= x < self.boardSize, "Not a valid x position on the board"
-        assert 0 <= y < self.boardSize, "Not a valid y position on the board"
+        assert 0 < x <= self.boardSize, "Not a valid x position on the board"
+        assert 0 < y <= self.boardSize, "Not a valid y position on the board"
         assert x - len(tiles) >= 0 or len(tiles) + x < self.boardSize, "Cannot place off the board in the x direction"
         assert y - len(tiles) >= 0 or len(tiles) + y < self.boardSize, "Cannot place off the board in the y direction"
         assert self.allEmpty(x,y,direction,tiles), "Cannot place a tile where there already is one"
 
-
-        # Need to account for placing tiles over existing tiles.
-        # ex:
-        #    State 1:
-        #    ' ',' ',' ',' '
-        #    ' ',' ',' ',' '
-        #    'L','E','E','T'
-        #    ' '.' ',' ',' '
-
-        #    State 2: placeTile(1,0,'y+',['L','E','E','T'])
-        #    ' ','L',' ',' '
-        #    ' ','E',' ',' '
-        #    'L','E','E','T'
-        #    ' '.'T',' ',' '
-        # Check that the would be intersected coordinate char is equal to the corresponding iterated incomingArr char
-        # Using above example because explaining is hard: (Not proper code)
-        # assert ['L','E','E','T'][2] == board[2][1]
-
-        # A player doesn't technically place the intersected tile again, they place the tiles all around it.
-        # You would do two 'seperate' placements
-        # ex: instead of previous call:
-        # placeTile(1,0,'y+',['L','E']) AND placeTile(1,3,'y+',['T'])
-
-        # assert self.board[y][x] == ' ', "Can't place a tile here!"
-
-
         # Is there a way to insert directly with a range
+        x -= 1
+        y -= 1
         if 'x' in list(direction):
             # Can these be made functional;
             if '-' in list(direction):
@@ -84,21 +60,16 @@ class Scrabble:
                 x = x - len(tiles) + 1
             for letter in range(len(tiles)):
                 tile = self.board[y][x+letter]
-                if tile != ' ':
+                if tile != self.noLetterYet:
                     valid = False
         else:
             if '-' in list(direction):
                 y = y - len(tiles) + 1
             for letter in range(len(tiles)):
                 tile = self.board[y+letter][x]
-                if tile != ' ':
+                if tile != self.noLetterYet:
                     valid = False
         return valid
-
-    def getBoard(self):
-        board = ''
-        [[print("a") for i in range(self.boardSize)] for j in range(self.boardSize)]
-
     # Don't need this
     def hasWordBeenMade(self):
         wordListR = []
@@ -118,12 +89,15 @@ class Scrabble:
             print('[' + wordList[word] + ']')
 
     def getBoard(self):
+        s = '  '
         for rows in range(self.boardSize):
             if rows == 0:
-                print('   ','    '.join(list(map(str,(list(range(0,10)))))),'  ','   '.join(list(map(str,(list(range(10,self.boardSize)))))))
-            printThis = str(rows) + " "
-            printThis += str(self.board[rows]) if rows > 9 else " " + str(self.board[rows])
+                print(s,s.join(list(map(str,(list(range(1,10)))))),s[0:1].join(list(map(str,(list(range(10,self.boardSize+1)))))))
+            printThis = str(rows+1) + s[0:1]
+            printThis += s.join(self.board[rows]) if rows+1 > 9 else s[0:1] + s.join(self.board[rows])
             print(printThis)
+
+    # def getBoardPretty(self):
 def main():
     board = Scrabble()
     b = board.board
@@ -131,7 +105,8 @@ def main():
     board.placeTile(9,3,'x-',word1)
     # Suppose to fail
     # board.placeTile(9,0,'y+',word1)
-    board.placeTile(9,0,'y+',word1[0:3])
+    board.placeTile(9,1,'y+',word1[0:2])
+    board.placeTile(9,4,'y+',word1[-1])
 
     print()
     board.getBoard()
