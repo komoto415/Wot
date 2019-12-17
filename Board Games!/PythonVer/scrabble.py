@@ -22,12 +22,14 @@ class Scrabble:
             }
 
     def placeTile(self, x, y, direction, tiles):
-        assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of proper tiles"
+        assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of valid tiles"
         assert direction in self.direction, "Not a valid direction"
         assert x - len(tiles) >= 0 or len(tiles) + x < self.boardSize, "Cannot place off the board in the x direction"
         assert y - len(tiles) >= 0 or len(tiles) + y < self.boardSize, "Cannot place off the board in the y direction"
         assert 0 <= x < self.boardSize, "Not a valid x position on the board"
         assert 0 <= y < self.boardSize, "Not a valid y position on the board"
+
+
         # Need to account for placing tiles over existing tiles.
         # ex:
         #    State 1:
@@ -45,25 +47,32 @@ class Scrabble:
         # Using above example because explaining is hard: (Not proper code)
         # assert ['L','E','E','T'][2] == board[2][1]
 
+        # A player doesn't technically place the intersected tile again, they place the tiles all around it.
+        # You would do two 'seperate' placements
+        # ex: instead of previous call:
+        # placeTile(1,0,'y+',['L','E']) AND placeTile(1,3,'y+',['T'])
+
         # assert self.board[y][x] == ' ', "Can't place a tile here!"
 
+
+        # Is there a way to insert directly with a range
+
         if 'x' in list(direction):
-            if '+' in list(direction):
-                for letter in range(len(tiles)):
-                    self.board[y][x+letter] = tiles[letter]
-            else:
-                for letter in range(len(tiles)):
-                    self.board[y][x-letter] = tiles[-1-letter]
+            # Can these be made functional;
+            if '-' in list(direction):
+                x = x - len(tiles) + 1
+            for letter in range(len(tiles)):
+                self.board[y][x+letter] = tiles[letter]
         else:
-            if '+' in list(direction):
-                for letter in range(len(tiles)):
-                    self.board[y+letter][x] = tiles[letter]
-                    self.points += self.tileSet[tiles[letter]]
-            else:
-                for letter in range(len(tiles)):
-                    self.board[y-letter][x] = tiles[-1-letter]
+            if '-' in list(direction):
+                y = y - len(tiles) + 1
+            for letter in range(len(tiles)):
+                self.board[y+letter][x] = tiles[letter]
 
         self.tallyPoints(tiles)
+
+    def checkIntersection(self, x, y, direction, tiles):
+        print()
 
     def tallyPoints(self, tiles):
         for i in range(len(tiles)):
@@ -91,7 +100,7 @@ def main():
     b = board.board
 
     print()
-    word1 = ['L','E','E','T']
+    word1 = ['L','E','T']
     board.placeTile(9,3,'x-',word1)
     # board.placeTile(1,2,'L')
 
