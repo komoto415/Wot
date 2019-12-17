@@ -5,7 +5,7 @@ class Scrabble:
         noLetterYet = ' '
         self.points = 0
         self.direction = ['x+', 'x-', 'y+', 'y-']
-        self.boardSize = 10
+        self.boardSize = 15
         self.board = [[noLetterYet for i in range(self.boardSize)] for j in range(self.boardSize)]
         # Where (0,0) is the top left and (self.boardSize-1, self.boardSize-1) is the bottom right
         # board[COLOUMNS][ROWS]
@@ -80,7 +80,6 @@ class Scrabble:
     def allEmpty(self, x, y, direction, tiles):
         valid = True
         if 'x' in list(direction):
-            # Can these be made functional;
             if '-' in list(direction):
                 x = x - len(tiles) + 1
             for letter in range(len(tiles)):
@@ -121,20 +120,26 @@ class Scrabble:
     def getBoard(self):
         for rows in range(self.boardSize):
             if rows == 0:
-                print('   ','    '.join(list(map(str,(list(range(0,self.boardSize)))))))
-            print(rows,self.board[rows])
-
+                print('   ','    '.join(list(map(str,(list(range(0,10)))))),'  ','   '.join(list(map(str,(list(range(10,self.boardSize)))))))
+            printThis = str(rows) + " "
+            printThis += str(self.board[rows]) if rows > 9 else " " + str(self.board[rows])
+            print(printThis)
 def main():
     board = Scrabble()
     b = board.board
-
     word1 = ['L','E','E','T']
     board.placeTile(9,3,'x-',word1)
     # Suppose to fail
     # board.placeTile(9,0,'y+',word1)
     board.placeTile(9,0,'y+',word1[0:3])
+
     print()
     board.getBoard()
+
     print()
     print(board.points)
+
+    tS = board.tileSet
+
+    print(tS)
 main()
