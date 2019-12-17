@@ -9,6 +9,7 @@ class Scrabble:
         self.board = [[noLetterYet for i in range(self.boardSize)] for j in range(self.boardSize)]
         # Where (0,0) is the top left and (self.boardSize-1, self.boardSize-1) is the bottom right
         # board[COLOUMNS][ROWS]
+        # Positive x and y are right and down
         # Indexed by zero
         self.tileSet = {
                 'O' : 0,
@@ -26,10 +27,11 @@ class Scrabble:
     def placeTile(self, x, y, direction, tiles):
         assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of valid tiles"
         assert direction in self.direction, "Not a valid direction"
-        assert x - len(tiles) >= 0 or len(tiles) + x < self.boardSize, "Cannot place off the board in the x direction"
-        assert y - len(tiles) >= 0 or len(tiles) + y < self.boardSize, "Cannot place off the board in the y direction"
         assert 0 <= x < self.boardSize, "Not a valid x position on the board"
         assert 0 <= y < self.boardSize, "Not a valid y position on the board"
+        assert x - len(tiles) >= 0 or len(tiles) + x < self.boardSize, "Cannot place off the board in the x direction"
+        assert y - len(tiles) >= 0 or len(tiles) + y < self.boardSize, "Cannot place off the board in the y direction"
+        assert self.allEmpty(x,y,direction,tiles), "Cannot place a tile where there already is one"
 
 
         # Need to account for placing tiles over existing tiles.
@@ -61,19 +63,42 @@ class Scrabble:
         if 'x' in list(direction):
             # Can these be made functional;
             if '-' in list(direction):
-                x = x - len(tiles) + 1
+                x = self.adjust(x, len(tiles))
             for letter in range(len(tiles)):
                 self.board[y][x+letter] = tiles[letter]
         else:
             if '-' in list(direction):
-                y = y - len(tiles) + 1
+                y = self.adjust(y, len(tiles))
             for letter in range(len(tiles)):
                 self.board[y+letter][x] = tiles[letter]
 
         self.points += reduce((lambda x,y: x+y), list(map(lambda x: self.tileSet[x], tiles)))
 
-    def checkIntersection(self, x, y, direction, tiles):
-        print()
+    def adjust(self, coor, len):
+        return coor - len + 1
+
+    def allEmpty(self, x, y, direction, tiles):
+        valid = True
+        if 'x' in list(direction):
+            # Can these be made functional;
+            if '-' in list(direction):
+                x = x - len(tiles) + 1
+            for letter in range(len(tiles)):
+                tile = self.board[y][x+letter]
+                if tile != ' ':
+                    valid = False
+        else:
+            if '-' in list(direction):
+                y = y - len(tiles) + 1
+            for letter in range(len(tiles)):
+                tile = self.board[y+letter][x]
+                if tile != ' ':
+                    valid = False
+        return valid
+
+    def getBoard(self):
+        board = ''
+        [[print("a") for i in range(self.boardSize)] for j in range(self.boardSize)]
 
     # Don't need this
     def hasWordBeenMade(self):
@@ -93,18 +118,23 @@ class Scrabble:
                 print()
             print('[' + wordList[word] + ']')
 
+    def getBoard(self):
+        for rows in range(self.boardSize):
+            if rows == 0:
+                print('   ','    '.join(list(map(str,(list(range(0,self.boardSize)))))))
+            print(rows,self.board[rows])
+
 def main():
     board = Scrabble()
     b = board.board
 
-    word1 = ['L','E','T']
+    word1 = ['L','E','E','T']
     board.placeTile(9,3,'x-',word1)
-    # board.placeTile(1,2,'L')
-
+    # Suppose to fail
+    # board.placeTile(9,0,'y+',word1)
+    board.placeTile(9,0,'y+',word1[0:3])
     print()
-    for rows in b:
-        print(rows)
-
+    board.getBoard()
     print()
     print(board.points)
 main()
