@@ -25,15 +25,31 @@ class Scrabble:
                 'P' : 9
             }
 
+    # IDEA:
+    #   Should you be able to place in the negative direction?
+    #   If yes, then place in reversed order or adjust 'starting' index and place in standing order
+    #   eg: placeTile(0, 3, x-, [L,O,S])
+    #       case 1:
+    #           -  S  O  L  -  -
+    #           -  -  -  -  -  -
+    #           -  -  -  -  -  -
+    #           -  -  -  -  -  -
+    #       case 2:
+    #           -  L  O  S  -  -
+    #           -  -  -  -  -  -
+    #           -  -  -  -  -  -
+    #           -  -  -  -  -  -
+
+    # Need to check if the tiles placed is at some point to adjacent to an already placed tile
     def placeTile(self, x, y, direction, tiles):
         assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of valid tiles"
         assert direction in ['x+', 'x-', 'y+', 'y-'], "Not a valid direction"
         assert 0 <= x < self.boardSize, "Not a valid x position on the board"
         assert 0 <= y < self.boardSize, "Not a valid y position on the board"
-        assert x == y and x == 7 if points == 0 else True, "The first set of tiles have to go over the starting position"
+        # assert x == y and x == 7 if points == 0 else True, "The first set of tiles have to go over the starting position"
         assert self.check(x, direction, len(tiles)) if 'x' in direction else True, "Cannot place off the board in the x direction"
         assert self.check(y, direction, len(tiles)) if 'y' in direction else True, "Cannot place off the board in the y direction"
-        assert self.allEmpty(x,y,direction,tiles), "Cannot place a tile where there already is one"
+        assert self.allEmpty(x,y,direction,tiles, self.points), "Cannot place a tile where there already is one"
 
         # Is there a way to insert directly with a range
         if 'x' in list(direction):
@@ -64,7 +80,8 @@ class Scrabble:
             valid = len + coor < self.boardSize
         return valid
 
-    def allEmpty(self, x, y, direction, tiles):
+    # Could use this same logic for the most part, but to check starting position
+    def allEmpty(self, x, y, direction, tiles, points):
         valid = True
         index = 0
         coor = x if 'x' in direction else y
@@ -72,8 +89,15 @@ class Scrabble:
             coor = x - len(tiles) + 1 if 'x' in direction else y - len(tiles) + 1
         while index < len(tiles) and valid:
             tile = self.board[y][coor+index] if 'x' in direction else self.board[coor+index][x]
-            if tile != self.noLetterYet and tile != self.startPos:
+            # if points != 0:
+            print(tile)
+            test1 = tile != self.noLetterYet
+            test2 = tile != self.startPos
+            print(test1, test2)
+            # valid = tile != self.noLetterYet or tile != self.startPos
+            if test1 and test2:
                 valid = False
+            print(valid)
             index += 1
         return valid
 
@@ -97,7 +121,8 @@ class Scrabble:
 def main():
     board = Scrabble()
     word1 = ['L','E','E','T']
-    board.placeTile(9,3,'y+',word1)
+    board.placeTile(7,4,'y+',word1)
+    board.placeTile(6,7,'x-',word1)
 
     # Suppose to fail
     # board.placeTile(9,6,'y+',word1)
