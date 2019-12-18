@@ -41,7 +41,6 @@ class Scrabble:
     #           -  -  -  -  -  -
     #           -  -  -  -  -  -
 
-    # Need to check if the tiles placed is at some point to adjacent to an already placed tile
     def placeTile(self, x, y, direction, tiles):
         assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of valid tiles"
         assert direction in ['x+', 'x-', 'y+', 'y-'], "Not a valid direction"
@@ -53,9 +52,8 @@ class Scrabble:
         assert self.checkStepping(x,y,direction,tiles), "Cannot place a tile where there already is one"
         assert self.checkAdjacency(x,y,direction,tiles) if self.points != 0 else True, "Must place next to an exisiting tile"
 
-        # Is there a way to insert directly with a range
         coor = self.adjust(x, y, direction, tiles)
-        # Can this be made functional?
+        # Can this be made functional or using list comprehension?
         for letter,_ in enumerate(tiles):
             if 'x' in direction:
                 self.board[y][coor+letter] = tiles[letter]
@@ -78,7 +76,7 @@ class Scrabble:
     def checkOffBoard(self, coor, direction, len):
         valid = True
         if '-' in direction:
-            valid = coor - len >= 0
+            valid = adjust(coor, len) >= 0
         elif '+' in direction:
             valid = len + coor < self.boardSize
         return valid
@@ -134,7 +132,6 @@ class Scrabble:
     def reset(self):
         self.__init__()
 
-    # def getBoardPretty(self):
 def main():
     board = Scrabble()
     word1 = ['L','E','E','T']
