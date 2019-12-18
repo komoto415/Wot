@@ -2,7 +2,7 @@ from functools import reduce
 
 class Scrabble:
     def __init__(self):
-        self.startPos = 'X'
+        self.startPos = '@'
         self.noLetterYet = '-'
         self.points = 0
         self.boardSize = 15
@@ -54,9 +54,7 @@ class Scrabble:
         assert self.checkAdjacency(x,y,direction,tiles) if self.points != 0 else True, "Must place next to an exisiting tile"
 
         # Is there a way to insert directly with a range
-        coor = x if 'x' in direction else y
-        if '-' in list(direction):
-            coor = self.adjust(x, len(tiles)) if 'x' in direction else self.adjust(y, len(tiles))
+        coor = self.adjust(x, y, direction, tiles)
         # Can this be made functional?
         for letter,_ in enumerate(tiles):
             if 'x' in direction:
@@ -74,6 +72,9 @@ class Scrabble:
     def adjust(self, coor, len):
         return coor - len + 1
 
+    def adjust(self, x, y, direction, tiles):
+        return x if 'x' in direction else y if '-' not in list(direction) else self.adjust(x, len(tiles)) if 'x' in direction else self.adjust(y, len(tiles))
+
     def checkOffBoard(self, coor, direction, len):
         valid = True
         if '-' in direction:
@@ -85,9 +86,7 @@ class Scrabble:
     def checkStepping(self, x, y, direction, tiles):
         valid = True if self.points != 0 else False
         index = 0
-        coor = x if 'x' in direction else y
-        if '-' in list(direction):
-            coor = self.adjust(x, len(tiles)) if 'x' in direction else self.adjust(y, len(tiles))
+        coor = self.adjust(x, y, direction, tiles)
         while index < len(tiles) and (valid if self.points != 0 else not valid):
             tile = self.board[y][coor+index] if 'x' in direction else self.board[coor+index][x]
             if self.points != 0:
@@ -103,24 +102,23 @@ class Scrabble:
         valid = False
         adjacent = []
         index = 0
-        coor = x if 'x' in direction else y
-        if '-' in list(direction):
-            coor = self.adjust(x, len(tiles)) if 'x' in direction else self.adjust(y, len(tiles))
+        coor = self.adjust(x, y, direction, tiles)
         while index < len(tiles):
-            adj1 = self.board[y+1][coor] if 'x' in direction else self.board[coor][x+1]
-            adj2 = self.board[y-1][coor] if 'x' in direction else self.board[coor][x-1]
+            adj1 = self.board[y+1][coor+index] if 'x' in direction else self.board[coor+index][x+1]
+            adj2 = self.board[y-1][coor+index] if 'x' in direction else self.board[coor+index][x-1]
             adjacent.append(adj1)
             adjacent.append(adj2)
             if index == 0:
-                adj3 = self.board[y][coor-1] if 'x' in direction else self.board[y-1][x]
+                adj3 = self.board[y][coor+index-1] if 'x' in direction else self.board[coor+index-1][x]
                 adjacent.append(adj3)
             elif index == len(tiles) - 1:
-                adj4 = self.board[y][coor+1] if 'x' in direction else self.board[y+1][x]
+                adj4 = self.board[y][coor+index+1] if 'x' in direction else self.board[coor+index+1][x]
                 adjacent.append(adj4)
             index += 1
         if len(set(adjacent)) > 1:
             valid = True
         return valid
+
     def getBoard(self):
         s = '  '
         for rows in range(self.boardSize):
@@ -143,7 +141,7 @@ def main():
     board.placeTile(7,4,'y+',word1)
     # board.placeTile(6,7,'x-',word1)
 
-    board.placeTile(8,6,'x+',word1)
+    board.placeTile(3,6,'x+',word1)
 
     # Suppose to fail
     # board.placeTile(14,14,'y+',word1)
