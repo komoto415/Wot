@@ -47,10 +47,11 @@ class Scrabble:
         assert direction in ['x+', 'x-', 'y+', 'y-'], "Not a valid direction"
         assert 0 <= x < self.boardSize, "Not a valid x position on the board"
         assert 0 <= y < self.boardSize, "Not a valid y position on the board"
-        assert self.checkStepping(x,y,direction,tiles, 0) == "Start" if self.points == 0 else True, "First placement of tiles must step over the starting position"
+        assert self.checkStepping(x,y,direction,tiles) if self.points == 0 else True, "First placement of tiles must step over the starting position"
         assert self.checkOffBoard(x, direction, len(tiles)) if 'x' in direction else True, "Cannot place off the board in the x direction"
         assert self.checkOffBoard(y, direction, len(tiles)) if 'y' in direction else True, "Cannot place off the board in the y direction"
-        assert self.checkStepping(x,y,direction,tiles, self.points) != "Exists", "Cannot place a tile where there already is one"
+        assert self.checkStepping(x,y,direction,tiles), "Cannot place a tile where there already is one"
+        assert self.checkAdjacency(x,y,direction,tiles) if self.points != 0 else True, "Must place next to an exisiting tile"
 
         # Is there a way to insert directly with a range
         coor = x if 'x' in direction else y
@@ -81,26 +82,45 @@ class Scrabble:
             valid = len + coor < self.boardSize
         return valid
 
-    def checkStepping(self, x, y, direction, tiles, points):
-        valid = True if points != 0 else False
+    def checkStepping(self, x, y, direction, tiles):
+        valid = True if self.points != 0 else False
         index = 0
         coor = x if 'x' in direction else y
         if '-' in list(direction):
             coor = self.adjust(x, len(tiles)) if 'x' in direction else self.adjust(y, len(tiles))
-        while index < len(tiles) and (valid if points != 0 else not valid):
+        while index < len(tiles) and (valid if self.points != 0 else not valid):
             tile = self.board[y][coor+index] if 'x' in direction else self.board[coor+index][x]
-            if points != 0:
+            if self.points != 0:
                 if tile != self.noLetterYet:
-                    valid = "Exists"
-            elif points == 0:
+                    valid = False
+            elif self.points == 0:
                 if tile == self.startPos:
-                    valid = "Start"
+                    valid = True
             index += 1
         return valid
 
     def checkAdjacency(self, x, y, direction, tiles):
-        print()
-        
+        valid = False
+        adjacent = []
+        index = 0
+        coor = x if 'x' in direction else y
+        if '-' in list(direction):
+            coor = self.adjust(x, len(tiles)) if 'x' in direction else self.adjust(y, len(tiles))
+        while index < len(tiles):
+            adj1 = self.board[y+1][coor] if 'x' in direction else self.board[coor][x+1]
+            adj2 = self.board[y-1][coor] if 'x' in direction else self.board[coor][x-1]
+            adjacent.append(adj1)
+            adjacent.append(adj2)
+            if index == 0:
+                adj3 = self.board[y][coor-1] if 'x' in direction else self.board[y-1][x]
+                adjacent.append(adj3)
+            elif index == len(tiles) - 1:
+                adj4 = self.board[y][coor+1] if 'x' in direction else self.board[y+1][x]
+                adjacent.append(adj4)
+            index += 1
+        if len(set(adjacent)) > 1:
+            valid = True
+        return valid
     def getBoard(self):
         s = '  '
         for rows in range(self.boardSize):
@@ -123,7 +143,7 @@ def main():
     board.placeTile(7,4,'y+',word1)
     # board.placeTile(6,7,'x-',word1)
 
-    board.placeTile(11,6,'x-',word1)
+    board.placeTile(8,6,'x+',word1)
 
     # Suppose to fail
     # board.placeTile(14,14,'y+',word1)
