@@ -136,10 +136,7 @@ def main():
     board = Scrabble()
     word1 = ['L','E','E','T']
     board.placeTile(7,4,'y+',word1)
-    # board.placeTile(6,7,'x-',word1)
-
     board.placeTile(3,6,'x+',word1)
-
     # Suppose to fail
     # board.placeTile(14,14,'y+',word1)
 
