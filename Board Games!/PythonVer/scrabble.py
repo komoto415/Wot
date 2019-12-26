@@ -41,7 +41,19 @@ class Scrabble:
     #           -  -  -  -  -  -
     #           -  -  -  -  -  -
 
-    def placeTile(self, x, y, direction, tiles):
+    def placeTiles(self, x, y, tile):
+        assert tile in self.tileSet.keys()
+        assert 0 <= x < self.boardSize, "Not a valid x position on the board"
+        assert 0 <= y < self.boardSize, "Not a valid y position on the board"
+        assert self.board[y][x] == noLetterYet if self.points != 0 else self.board[y][x] == startPos
+
+        board[y][x] = tile
+        points = tileSet[tile];
+        self.printPoints(points)
+
+        getBoard()
+
+    def placeTiles(self, x, y, direction, tiles):
         assert set(tiles).issubset(set(self.tileSet.keys())), "Not a list of valid tiles"
         assert direction in ['x+', 'x-', 'y+', 'y-'], "Not a valid direction"
         assert 0 <= x < self.boardSize, "Not a valid x position on the board"
@@ -61,9 +73,12 @@ class Scrabble:
                 self.board[coor+letter][x] = tiles[letter]
 
         points = reduce((lambda x,y: x+y), list(map(lambda x: self.tileSet[x], tiles)))
-        self.points += points
+        self.printPoints(points)
 
-        self.getBoard()
+        getBoard()
+
+    def printPoints(self, points):
+        self.points += points
         print("Points aquired from this placement", points)
         print("Current points:", self.points,'\n')
 
@@ -129,14 +144,11 @@ class Scrabble:
             if rows == self.boardSize-1:
                 print(s,s.join(list(map(str,(list(range(0,10)))))),s[0:1].join(list(map(str,(list(range(10,self.boardSize)))))))
 
-    def reset(self):
-        self.__init__()
-
 def main():
     board = Scrabble()
     word1 = ['L','E','E','T']
-    board.placeTile(7,4,'y+',word1)
-    board.placeTile(3,6,'x+',word1)
+    board.placeTiles(7,4,'y+',word1)
+    board.placeTiles(3,6,'x+',word1)
     # Suppose to fail
     # board.placeTile(14,14,'y+',word1)
 
