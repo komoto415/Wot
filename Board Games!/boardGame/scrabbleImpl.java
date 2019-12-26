@@ -22,7 +22,7 @@ class ScrabbleImpl implements Scrabble {
 	// board[COLOUMNS][ROWS] unfortunately no way around this. I think
 	// Positive x and y are right and down
 	// The matrix will be indexed by 0
-	
+
 	/*
         Precondition(s):
                             None
@@ -30,17 +30,18 @@ class ScrabbleImpl implements Scrabble {
                             Instantiate a scrabble game C:
 	 */
 	private final char STARTING_POSITION = 'X';
+	private final int X_CENTRE = 7;
+	private final int Y_CENTRE = 7;
 	public ScrabbleImpl() {
 		for (int i = 0; i < boardSize; i++) {
 			for (int j = 0; j < boardSize; j++) {
 				board[i][j] = EMPTY_SPACE;
-				// Replace magic number with constant
-				if (i == 7 && j == 7) {
+				if (i == Y_CENTRE && j == X_CENTRE) {
 					board[i][j] = STARTING_POSITION;
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < LETTERS_LIST.size(); i++){
 			alphabetConversion.put(LETTERS_LIST.get(i), i);
 		}
@@ -57,7 +58,7 @@ class ScrabbleImpl implements Scrabble {
 		board[y][x] = tile;
 
 		int pointsGained = alphabetConversion.get(tile);
-		
+
 		printPoints(pointsGained);
 		getBoard();
 	}
@@ -84,15 +85,16 @@ class ScrabbleImpl implements Scrabble {
 				board[y+i][x] = tiles[i];
 			}
 		}
-		
+
 		int pointsGained = 0;
 		for (char curVal : tiles) {
 			pointsGained += alphabetConversion.get(curVal);
 		}
-		
+
 		printPoints(pointsGained);
 		getBoard();
 	}
+
 
 	private boolean checkAdjacency(int x, int y) {
 		boolean valid = false;
@@ -104,7 +106,7 @@ class ScrabbleImpl implements Scrabble {
 		}
 		return valid;
 	}
-	
+
 	private boolean checkAdjacency(int x, int y, char direction, int tilesLength) {
 		boolean valid = false;
 		char adj1Body = EMPTY_SPACE;
@@ -132,7 +134,7 @@ class ScrabbleImpl implements Scrabble {
 		}
 		return valid;
 	}
-	
+
 	private boolean checkSteps(int x, int y, char direction, char[] tiles) {
 		boolean valid = points != 0 ? true : false;
 		int index = 0;
@@ -152,7 +154,7 @@ class ScrabbleImpl implements Scrabble {
 		}
 		return valid;
 	}
-	
+
 	private void printPoints(int pointsGained) {
 		points += pointsGained;
 		System.out.printf("Points gained from this placement: %d\n", pointsGained);
@@ -160,8 +162,8 @@ class ScrabbleImpl implements Scrabble {
 	}
 
 	private boolean isValidTileList(char[] tiles) {
-		Set<Character> incomingAsSet = new HashSet<Character>();
-		for (Character curVal : tiles) {
+		Set<Character> incomingAsSet = new HashSet<>();
+		for (char curVal : tiles) {
 			incomingAsSet.add(curVal);
 		}
 		Set<Character> lettersAsSet = new HashSet<>();
@@ -181,7 +183,7 @@ class ScrabbleImpl implements Scrabble {
 			System.out.print(i > 9  ? rowNum : " " + rowNum);
 			for (int j = 0; j < boardSize; j++) {
 				if (j != 0) {
-					System.out.print(" "); 
+					System.out.print(" ");
 				}
 				System.out.print(board[i][j]);
 				System.out.print(" ");
