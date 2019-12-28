@@ -46,15 +46,15 @@ def main():
 
     alphabet = getSubstitutions('alphabet')
 
-    rotorAlphaList = Enigma.Rotor(makeList([], getSubstitutions('rotorAlpha')))
+    rotorAlphaList = Enigma.Rotor(makeDict([], getSubstitutions('rotorAlpha')))
 
-    rotorBetaList = Enigma.Rotor(makeList([], getSubstitutions('rotorBeta')))
+    rotorBetaList = Enigma.Rotor(makeDict([], getSubstitutions('rotorBeta')))
 
-    rotorCharlieList = Enigma.Rotor(makeList([], getSubstitutions('rotorCharlie')))
+    rotorCharlieList = Enigma.Rotor(makeDict([], getSubstitutions('rotorCharlie')))
 
-    reflectorAlphaList = Enigma.Rotor(makeList([], getSubstitutions('reflector1')))
+    reflectorAlphaList = Enigma.Rotor(makeDict([], getSubstitutions('reflector1')))
 
-    reflectorBetaList = Enigma.Rotor(makeList([], getSubstitutions('reflector2')))
+    reflectorBetaList = Enigma.Rotor(makeDict([], getSubstitutions('reflector2')))
 
 #     All Dicts
 #     global rotorAlphaDict;
@@ -91,7 +91,7 @@ def main():
         else:
             print("Try again")
 
-def makeList(liste, subs):
+def makeDict(liste, subs):
     for i in range(26):
         liste.append([alphabet[i],subs[i]])
     return liste
