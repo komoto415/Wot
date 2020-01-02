@@ -6,13 +6,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 class ScrabbleImpl implements Scrabble {
 	private static int boardSize = 15;
 	private static char[][] board = new char[boardSize][boardSize];
 	private static HashMap<Character, Integer> alphabetConversion = new HashMap<>();
 	private static int points = 0;
-
 	private final char EMPTY_SPACE = '-';
 	private final List<Character> LETTERS_LIST = new ArrayList<>(Arrays.asList(
 			'O','L','Z','E','A','S','G','T','B','P')
@@ -66,16 +67,39 @@ class ScrabbleImpl implements Scrabble {
 	private final char X_DIRECTION = 'x';
 	private final char Y_DIRECTION = 'y';
 	// For this, direction expecting positive direction
-	public void placeTiles(int x, int y, char direction, char[] tiles) {
-		assert isValidTileList(tiles);
-		assert direction == X_DIRECTION || direction == Y_DIRECTION;
-		assert 0 <= x && x < board.length-1;
-		assert 0 <= y && y < board.length-1;
-		assert points == 0 ? checkSteps(x, y, direction, tiles) : true;
-		assert direction == X_DIRECTION ? x + tiles.length < board.length : true;
-		assert direction == Y_DIRECTION ? y + tiles.length < board.length : true;
-		assert checkSteps(x, y, direction, tiles);
-		assert points != 0 ? checkAdjacency(x, y, direction, tiles.length) : true;
+	public void placeTiles(int x, int y, char direction, Character[] tiles) {
+		assert isValidTileList(tiles) : 
+			"Invalid send! tiles: [" + tiles + "] "
+			+ "Your tiles list contains one or more invalid values";
+		assert direction == X_DIRECTION || direction == Y_DIRECTION : 
+			"Invalid send! direction: [" + direction + "] "
+			+ "That is not a valid direction";
+		assert 0 <= x && x < board.length-1 : 
+			"Invalid send! x: [" + x + "] "
+			+ "That value is out of the valid row range";
+		assert 0 <= y && y < board.length-1 : 
+			"Invalid send! y: [" + y + "] "
+			+ "That value is out of the valid coloumn range";
+		assert direction == X_DIRECTION ? x + tiles.length < board.length : true : 
+			"Invalid send!: x, tiles: [" + x + ", " + tiles + "] "
+			+ "That combination of row and how many tiles to place in the x-direction "
+			+ "would go off the board";
+		assert direction == Y_DIRECTION ? y + tiles.length < board.length : true : 
+			"Invalid send!: y, tiles: [" + y + ", " + tiles + "] "
+			+ "That combination of row and how many tiles to place in the y-direction "
+			+ "would go off the board";
+		assert points == 0 ? checkSteps(x, y, direction, tiles) : true :
+			"Invalid send! "
+			+ "That combination of coordinates, direction and tiles does not "
+			+ "start on the starting position";
+		assert checkSteps(x, y, direction, tiles) :
+			"Invalid send! "
+			+ "That combination of coordinates, direction and tiles would place a tile "
+			+ "where a tile already exists";
+		assert points != 0 ? checkAdjacency(x, y, direction, tiles.length) : true :
+			"Invalid send! "
+			+ "That combination of coordinates, direction and tiles is not "
+			+ "has no points of adjacency to an already placed tile";
 
 		for (int i = 0; i < tiles.length; i++) {
 			if (direction == X_DIRECTION) {
@@ -86,10 +110,12 @@ class ScrabbleImpl implements Scrabble {
 			}
 		}
 
-		int pointsGained = 0;
-		for (char curVal : tiles) {
-			pointsGained += alphabetConversion.get(curVal);
-		}
+		int pointsGained =
+					Stream.of(tiles)
+					.flatMapToInt(IntStream::of)
+					.mapToObj(ch -> Character.toString((char)ch))
+					.map(ch -> alphabetConversion.get(ch.charAt(0)))
+					.reduce(0, (num1, num2) -> num1 + num2); 
 
 		printPoints(pointsGained);
 		getBoard();
@@ -135,7 +161,7 @@ class ScrabbleImpl implements Scrabble {
 		return valid;
 	}
 
-	private boolean checkSteps(int x, int y, char direction, char[] tiles) {
+	private boolean checkSteps(int x, int y, char direction, Character[] tiles) {
 		boolean valid = points != 0 ? true : false;
 		int index = 0;
 		while (index < tiles.length && (points != 0 ? valid : !valid)) {
@@ -161,7 +187,7 @@ class ScrabbleImpl implements Scrabble {
 		System.out.printf("Total Points: %d\n", points);
 	}
 
-	private boolean isValidTileList(char[] tiles) {
+	private boolean isValidTileList(Character[] tiles) {
 		Set<Character> incomingAsSet = new HashSet<>();
 		for (char curVal : tiles) {
 			incomingAsSet.add(curVal);
@@ -194,7 +220,7 @@ class ScrabbleImpl implements Scrabble {
 
 	public static void main(String[]args) {
 		Scrabble test = new ScrabbleImpl();
-		test.placeTiles(5, 7, 'x', new char[] {'A', 'B', 'B'});
-		test.placeTiles(7, 4, 'y', new char[] {'A', 'B', 'B'});
+		test.placeTiles(5, 7, 'x', new Character[] {'A', 'B', 'B'});
+		test.placeTiles(7, 4, 'y', new Character[] {'A', 'B', 'B'});
 	}
 }

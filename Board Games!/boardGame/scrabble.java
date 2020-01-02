@@ -5,7 +5,7 @@ public interface Scrabble {
     // Update board
     public void placeTile(int x, int y, char tile);
 
-    public void placeTiles(int x, int y, char direction, char[] tiles);
+    public void placeTiles(int x, int y, char direction, Character[] tiles);
 
     public void getBoard();
 	

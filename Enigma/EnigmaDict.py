@@ -32,7 +32,7 @@ class PlugBoard:
 
     def __init__(self, connections):
         self.connections = connections
-    
+
     def encipher(self, send, direction):
         if send in list(self.connections.keys()) and direction:
             return self.connections[send]
@@ -49,7 +49,7 @@ class PlugBoard:
         return f'Substitution: {self.connections}'
 
 
-class Machine: 
+class Machine:
 
     def __init__(self, reflector, rotorOne, rotorTwo, rotorThr, plugBrd):
         self.reflector = reflector
@@ -70,7 +70,7 @@ class Machine:
                 Plug Board: {self.plugBrd}
                 '''
 
-    
+
 def main():
     global alphabet
     alphabet = getSubstitutions('alphabet')
@@ -85,7 +85,7 @@ def main():
     print('|    Z X C V B N M       nope |')
     print('|_____________________________|')
     print()
-    
+
     print("Lets determine your board settings first!")
     menu = True
     while menu:
@@ -121,21 +121,21 @@ def applyInputs():
         positions = settings[1]
         reflc = settings[2]
         plugBrd = settings[3]
-    
+
         reflect = numberToReflc(reflc)
-    
+
         rotorThr = numberToRotor(int(rotors[2]))
         rotorTwo = numberToRotor(int(rotors[1]))
         rotorOne = numberToRotor(int(rotors[0]))
-    
+
         rotorThr.position = int(positions[2])
         rotorTwo.position = int(positions[1])
         rotorOne.position = int(positions[0])
-        
+
         plugBrd = PlugBoard(plugBrd)
-        
+
         myMachine = Machine(reflect, rotorOne, rotorTwo, rotorThr, plugBrd)
-        
+
     return myMachine
 
 
@@ -176,19 +176,25 @@ def getSettings():
         validInput = reflector == 1 or reflector == 2
         if not validInput:
             print('no goo')
-    
+
     validInput = False
     while not validInput:
         plugBrd = input("\nWhat plug board connections do you wants? ")
-        validInput = re.match("^([A-Z]{2})( [A-Z]{2})*", plugBrd.strip())
+        plugBrd = plugBrd.lstrip()
+        validInput = re.match("^([A-Z]{2} ){,10}$", (plugBrd + ' '))
         if not validInput:
             print('no goo')
-    plugBrd = list(plugBrd.split(" "))
+        else:
+            keys = list(filter(lambda index, value: index % 3 == 0, enumerate(plugBrd)))
+            values = list(filter(lambda index, value: index % 3 == 1, enumerate(plugBrd)))
+            any_in = lambda a, b: bool(set(keys).intersection(values))
+            validInput = len(set(keys)) == len(set(values)) and not any_in
+            if not validInput:
+                print('no goo')
     plugBrdDict = {}
-    for i in range(len(plugBrd)):
-        plugBrd[i] = list(plugBrd[i])
-        plugBrdDict[plugBrd[i][0]] = plugBrd[i][1]  # no number conversion
-    
+    for index, key in enumerate(keys):
+        plugBrdDict[key] = values[index]
+
     return [rotors, positions, reflector, plugBrdDict]
 
 
@@ -198,7 +204,7 @@ def execute(myMachine, message):
         encipherLetter = message[index]
         if encipherLetter == " ":
             retString += " "
-        else: 
+        else:
             encipherLetter = myMachine.plugBrd.encipher(encipherLetter, True)
             encipherLetter = myMachine.rotorThr.encipher(encipherLetter, True)
             encipherLetter = myMachine.rotorTwo.encipher(encipherLetter, True)
@@ -210,11 +216,11 @@ def execute(myMachine, message):
             encipherLetter = myMachine.plugBrd.encipher(encipherLetter, False)
             retString += encipherLetter
         moveRotors(myMachine)
-        
+
     return retString
 
 
-    # Doesn't quite work at all. Well, rotations are fine, it just isn't effecting the 
+    # Doesn't quite work at all. Well, rotations are fine, it just isn't effecting the
     # encrypting process
 def moveRotors(myMachine):
     myMachine.rotorThr.rotate()

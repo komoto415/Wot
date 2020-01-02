@@ -75,12 +75,12 @@ class Scrabble:
         points = reduce((lambda x,y: x+y), list(map(lambda x: self.tileSet[x], tiles)))
         self.printPoints(points)
 
-        getBoard()
+        self.getBoard()
 
     def printPoints(self, points):
         self.points += points
         print("Points aquired from this placement", points)
-        print("Current points:", self.points,'\n')
+        print("Current points:", self.points)
 
     def adjust(self, coor, len):
         return coor - len + 1
@@ -133,16 +133,18 @@ class Scrabble:
         return valid
 
     def getBoard(self):
-        s = '  '
+        space = '  '
+        print('Board Status:')
         for rows in range(self.boardSize):
             if rows == 0:
-                print(s,s.join(list(map(str,(list(range(0,10)))))),s[0:1].join(list(map(str,(list(range(10,self.boardSize)))))))
-            printThis = s[0:1] + str(rows) if rows < 10 else str(rows) + s[0:1]
-            printThis += s.join(self.board[rows]) if rows > 9 else s[0:1] + s.join(self.board[rows])
-            printThis += s[0:1] +str(rows)
+                print(space,space.join(list(map(str,(list(range(0,10)))))),space[0:1].join(list(map(str,(list(range(10,self.boardSize)))))))
+            printThis = space[0:1] + str(rows) if rows < 10 else str(rows) + space[0:1]
+            printThis += space.join(self.board[rows]) if rows > 9 else space[0:1] + space.join(self.board[rows])
+            printThis += space[0:1] +str(rows)
             print(printThis)
             if rows == self.boardSize-1:
-                print(s,s.join(list(map(str,(list(range(0,10)))))),s[0:1].join(list(map(str,(list(range(10,self.boardSize)))))))
+                print(space,space.join(list(map(str,(list(range(0,10)))))),space[0:1].join(list(map(str,(list(range(10,self.boardSize)))))))
+        print()
 
 def main():
     board = Scrabble()
