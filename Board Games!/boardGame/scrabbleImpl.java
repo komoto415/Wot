@@ -145,16 +145,18 @@ class ScrabbleImpl implements Scrabble {
 		while (index < tilesLength) {
 			adj1Body = direction == X_DIRECTION ? board[y+1][x+index] : board[y+index][x+1];
 			adj2Body = direction == X_DIRECTION ? board[y-1][x+index] : board[y+index][x-1];
+			adjacentSpaces.add(adj1Body);
+			adjacentSpaces.add(adj2Body);
 			if (index == 0) {
 				adjHead = direction == X_DIRECTION ? board[y][x+index-1] : board[y+index-1][x];
+				adjacentSpaces.add(adjHead);
 			}
 			else if (index == tilesLength - 1) {
 				adjTail = direction == X_DIRECTION ? board[y][x+index+1] : board[y+index+1][x];
+				adjacentSpaces.add(adjTail);
 			}
 			index++;
 		}
-		adjacentSpaces.addAll(new ArrayList<>(Arrays.asList(
-				adj1Body, adj2Body, adjHead, adjTail)));
 		if (adjacentSpaces.size() > 1) {
 			valid = true;
 		}
