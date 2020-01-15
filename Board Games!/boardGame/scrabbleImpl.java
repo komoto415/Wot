@@ -68,23 +68,23 @@ class ScrabbleImpl implements Scrabble {
 	private final char Y_DIRECTION = 'y';
 	// For this, direction expecting positive direction
 	public void placeTiles(int x, int y, char direction, Character[] tiles) {
-		assert isValidTileList(tiles) : 
+		assert isValidTileList(tiles) :
 			"Invalid send! tiles: [" + tiles + "] "
 			+ "Your tiles list contains one or more invalid values";
-		assert direction == X_DIRECTION || direction == Y_DIRECTION : 
+		assert direction == X_DIRECTION || direction == Y_DIRECTION :
 			"Invalid send! direction: [" + direction + "] "
 			+ "That is not a valid direction";
-		assert 0 <= x && x < board.length-1 : 
+		assert 0 <= x && x < board.length : 
 			"Invalid send! x: [" + x + "] "
 			+ "That value is out of the valid row range";
-		assert 0 <= y && y < board.length-1 : 
+		assert 0 <= y && y < board.length :
 			"Invalid send! y: [" + y + "] "
 			+ "That value is out of the valid coloumn range";
-		assert direction == X_DIRECTION ? x + tiles.length < board.length : true : 
+		assert direction == X_DIRECTION ? x + tiles.length < board.length : true :
 			"Invalid send!: x, tiles: [" + x + ", " + tiles + "] "
 			+ "That combination of row and how many tiles to place in the x-direction "
 			+ "would go off the board";
-		assert direction == Y_DIRECTION ? y + tiles.length < board.length : true : 
+		assert direction == Y_DIRECTION ? y + tiles.length < board.length : true :
 			"Invalid send!: y, tiles: [" + y + ", " + tiles + "] "
 			+ "That combination of row and how many tiles to place in the y-direction "
 			+ "would go off the board";
@@ -115,7 +115,7 @@ class ScrabbleImpl implements Scrabble {
 					.flatMapToInt(IntStream::of)
 					.mapToObj(ch -> Character.toString((char)ch))
 					.map(ch -> alphabetConversion.get(ch.charAt(0)))
-					.reduce(0, (num1, num2) -> num1 + num2); 
+					.reduce(0, (num1, num2) -> num1 + num2);
 
 		printPoints(pointsGained);
 		getBoard();
